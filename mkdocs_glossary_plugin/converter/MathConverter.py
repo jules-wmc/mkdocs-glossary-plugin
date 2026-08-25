@@ -14,5 +14,8 @@ class MathConverter(BaseConverter):
     def __init__(self: "MathConverter") -> None:
         pass
 
+    def convert(self: "MathConverter", context: Context, target: Math) -> List[Any]:
+        return [target]
+
 
 CONVERTER_TABLE[Math] = MathConverter()

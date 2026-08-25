@@ -14,5 +14,10 @@ class DisplayMathConverter(BaseConverter):
     def __init__(self: "DisplayMathConverter") -> None:
         pass
 
+    def convert(
+        self: "DisplayMathConverter", context: Context, target: DisplayMath
+    ) -> List[Any]:
+        return [target]
+
 
 CONVERTER_TABLE[DisplayMath] = DisplayMathConverter()
