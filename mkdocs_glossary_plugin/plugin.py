@@ -55,6 +55,7 @@ class GlossaryPlugin(BasePlugin):
                 choices=[
                     "markdown",
                     "markdown_mmd",
+                    "markdown_phpextra",
                     "markdown_phpextra+tex_math_dollars",
                     "markdown_strict",
                 ],
