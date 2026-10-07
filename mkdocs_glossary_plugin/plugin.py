@@ -138,13 +138,6 @@ class GlossaryPlugin(BasePlugin):
             self.__glossary.extend(words)
         self.__glossary.sort(key=lambda x: len(x.name), reverse=True)
 
-        # validation
-        for invalid_word in [x for x in self.__glossary if " " in x.name]:
-            print(
-                f"[WARNING]`{invalid_word.name}` includes spaces, but we can't support it."
-            )
-        self.__glossary = [x for x in self.__glossary if not " " in x.name]
-
         return files
 
     def on_nav(
