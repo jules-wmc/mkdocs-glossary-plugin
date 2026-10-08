@@ -38,6 +38,7 @@ class BuiltInTypeConverter(BaseConverter):
             target[child_index + 1 : child_index + 1] = converted[1:]
         return [target]
 
+
     def convert_dict(
         self: "BuiltInTypeConverter", context: Context, target: Dict[Any, Any]
     ) -> List[Any]:

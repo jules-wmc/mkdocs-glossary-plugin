@@ -11,6 +11,8 @@ except:
 
 
 class StrongConverter(BaseConverter):
+    support_flatten_conversion = True
+
     def __init__(self: "StrongConverter") -> None:
         pass
 
