@@ -11,6 +11,8 @@ except:
 
 
 class SpanConverter(BaseConverter):
+    support_flatten_conversion = True
+
     def __init__(self: "SpanConverter") -> None:
         pass
 

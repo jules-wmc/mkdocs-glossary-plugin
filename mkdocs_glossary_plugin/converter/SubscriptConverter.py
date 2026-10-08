@@ -11,6 +11,8 @@ except:
 
 
 class SubscriptConverter(BaseConverter):
+    support_flatten_conversion = True
+
     def __init__(self: "SubscriptConverter") -> None:
         pass
 

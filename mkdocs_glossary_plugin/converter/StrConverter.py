@@ -1,4 +1,5 @@
 from .BaseConverter import BaseConverter, CONVERTER_TABLE, Context, Word
+from .GlossaryLinkFactory import make_glossary_link
 from typing import Any, List
 import os
 
@@ -39,8 +40,7 @@ class StrConverter(BaseConverter):
                 result.extend(self.__convert(context, Str(target_str[0:start_index])))
 
             link_str: Str = Str(target_str[start_index : start_index + len(word.name)])
-            relative_path: str = os.path.relpath(word.source_path, context.current_dir)
-            result.append(Link(("", [], []), [link_str], (relative_path, "")))  # type: ignore
+            result.append(make_glossary_link(context, word, [link_str]))
 
             if start_index + len(word.name) != len(target_str):
                 result.extend(
