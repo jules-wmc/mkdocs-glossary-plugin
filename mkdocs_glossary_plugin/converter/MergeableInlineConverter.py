@@ -2,6 +2,7 @@ from .Context import Context, Word
 from .GlossaryLinkFactory import make_glossary_link
 from typing import Any, List, Tuple
 import logging
+import re
 
 import pandoc
 from pandoc.types import *
@@ -23,6 +24,14 @@ def is_mergeable_inline(context: Context, child: Any) -> bool:
     return isinstance(child, Space) or isinstance(child, SoftBreak)
 
 
+def find_whole_word(haystack: str, needle: str) -> int:
+    """Find the first occurrence of needle in haystack that isn't part of a larger word."""
+    if not needle:
+        return -1
+    match = re.search(r"(?<!\w)" + re.escape(needle) + r"(?!\w)", haystack)
+    return match.start() if match else -1
+
+
 class MergeableInlineConverter:
     def __init__(self: "MergeableInlineConverter") -> None:
         pass
@@ -40,7 +49,7 @@ class MergeableInlineConverter:
             )
 
             # context.glossary is sorted longest-name-first, so the first hit found here is the longest match
-            match_start_offset: int = haystack_text.find(needle_text)
+            match_start_offset: int = find_whole_word(haystack_text, needle_text)
             if match_start_offset == -1:
                 continue
             match_end_offset: int = match_start_offset + len(word.name)
