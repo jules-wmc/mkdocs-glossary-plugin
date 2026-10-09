@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Optional
 from collections import namedtuple
 
 from mkdocs.config import Config
 
-Word = namedtuple("Word", ["name", "source_path"])
+# is_case_sensitive overrides the global is_case_sensitive setting for this word when not None
+Word = namedtuple("Word", ["name", "source_path", "is_case_sensitive"], defaults=[None])
 
 
 class Context:

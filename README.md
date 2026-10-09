@@ -69,6 +69,14 @@ This is the glossary page for x_word!
 
 That's all! Now, all the `x_word`, `alias_word_a` and `alias_word_b` in your project will be replaced with a link to x_word.md when building.
 
+If you want to override the global `is_case_sensitive` option for this glossary entry only, set `glossary_case_sensitive` in the same metadata block. When unset, the global `is_case_sensitive` option is used.
+
+```
+---
+glossary_case_sensitive: False
+---
+```
+
 
 # Options
 

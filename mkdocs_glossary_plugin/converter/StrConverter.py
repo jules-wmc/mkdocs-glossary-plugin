@@ -26,11 +26,16 @@ class StrConverter(BaseConverter):
         result: List[Any] = []
         target_str: str = target[0]
         for word in context.glossary:
+            is_case_sensitive: bool = (
+                context.is_case_sensitive
+                if word.is_case_sensitive is None
+                else word.is_case_sensitive
+            )
             matching_word_name: str = (
-                word.name if context.is_case_sensitive else word.name.lower()
+                word.name if is_case_sensitive else word.name.lower()
             )
             matching_target_str: str = (
-                target_str if context.is_case_sensitive else target_str.lower()
+                target_str if is_case_sensitive else target_str.lower()
             )
 
             start_index: int = matching_target_str.find(matching_word_name)

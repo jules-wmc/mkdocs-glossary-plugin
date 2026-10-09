@@ -37,11 +37,16 @@ class MergeableInlineConverter:
         merged_text, child_text_spans = self.__flatten_inlines(target)
 
         for word in context.glossary:
+            is_case_sensitive: bool = (
+                context.is_case_sensitive
+                if word.is_case_sensitive is None
+                else word.is_case_sensitive
+            )
             haystack_text: str = (
-                merged_text if context.is_case_sensitive else merged_text.lower()
+                merged_text if is_case_sensitive else merged_text.lower()
             )
             needle_text: str = (
-                word.name if context.is_case_sensitive else word.name.lower()
+                word.name if is_case_sensitive else word.name.lower()
             )
 
             # context.glossary is sorted longest-name-first, so the first hit found here is the longest match
