@@ -26,6 +26,7 @@ from .converter.PandocConverter import PandocConverter  # type: ignore
 
 class Const:
     GLOSSARY = "glossary"
+    GLOSSARY_CASE_SENSITIVE = "glossary_case_sensitive"
 
 
 # See https://github.com/mkdocs/mkdocs/blob/1.2.2/docs/dev-guide/plugins.md
@@ -43,6 +44,7 @@ class GlossaryPlugin(BasePlugin):
                     "markdown",
                     "markdown_mmd",
                     "markdown_phpextra",
+                    "markdown_phpextra+tex_math_dollars",
                     "markdown_strict",
                 ],
                 default="markdown_phpextra",
@@ -55,6 +57,7 @@ class GlossaryPlugin(BasePlugin):
                     "markdown",
                     "markdown_mmd",
                     "markdown_phpextra",
+                    "markdown_phpextra+tex_math_dollars",
                     "markdown_strict",
                 ],
                 default="markdown_phpextra",
@@ -66,6 +69,7 @@ class GlossaryPlugin(BasePlugin):
         ("replace_header", config_options.Type(bool, default=False)),
         ("replace_table_header", config_options.Type(bool, default=True)),
         ("replace_table_body", config_options.Type(bool, default=True)),
+        ("replace_math_element", config_options.Type(bool, default=False)),
     )
 
     def __init__(self: "GlossaryPlugin") -> None:
@@ -134,13 +138,6 @@ class GlossaryPlugin(BasePlugin):
             words: List[Word] = self.__convert_file_to_words(config, file)
             self.__glossary.extend(words)
         self.__glossary.sort(key=lambda x: len(x.name), reverse=True)
-
-        # validation
-        for invalid_word in [x for x in self.__glossary if " " in x.name]:
-            print(
-                f"[WARNING]`{invalid_word.name}` includes spaces, but we can't support it."
-            )
-        self.__glossary = [x for x in self.__glossary if not " " in x.name]
 
         return files
 
@@ -243,7 +240,9 @@ class GlossaryPlugin(BasePlugin):
         result: List[Word] = []
         src_relative_path: str = self.__docs_dir + "/" + file.src_path
 
-        word_names: List[str] = [file.name] + self.__extract_alias_names(file)
+        meta: dict = self.__read_meta(file)
+        word_names: List[str] = [file.name] + self.__extract_alias_names(meta)
+        is_case_sensitive: Optional[bool] = self.__extract_case_sensitive(meta)
         overlapped_word_names: List[str] = [
             x for x in word_names if x in [y.name for y in self.__glossary]
         ]
@@ -254,12 +253,12 @@ class GlossaryPlugin(BasePlugin):
             x for x in word_names if not x in [y.name for y in self.__glossary]
         ]
         for word_name in word_names:
-            current_word: Word = Word(word_name, src_relative_path)
+            current_word: Word = Word(word_name, src_relative_path, is_case_sensitive)
             result.append(current_word)
 
         return result
 
-    def __extract_alias_names(self: "GlossaryPlugin", file: File) -> List[str]:
+    def __read_meta(self: "GlossaryPlugin", file: File) -> dict:
         # NOTE
         # We should use the python pandoc modulce to parse meta deta in each files,
         # but we use the markdown module to parse becuase the python pandoc modulce seems not to be able to parse yaml block meta data at the head of the file.
@@ -268,13 +267,24 @@ class GlossaryPlugin(BasePlugin):
         with open(file.abs_src_path, "r") as f:
             data: AnyStr = f.read()  # type: ignore
             md.convert(data)
+        return md.Meta  # type: ignore
+
+    def __extract_alias_names(self: "GlossaryPlugin", meta: dict) -> List[str]:
         if (
-            not Const.GLOSSARY in md.Meta  # type: ignore
-            or not md.Meta[Const.GLOSSARY]  # type: ignore
-            or not md.Meta[Const.GLOSSARY][0]  # type: ignore
+            not Const.GLOSSARY in meta
+            or not meta[Const.GLOSSARY]
+            or not meta[Const.GLOSSARY][0]
         ):
             return []
-        return md.Meta[Const.GLOSSARY]  # type: ignore
+        return meta[Const.GLOSSARY]
+
+    def __extract_case_sensitive(self: "GlossaryPlugin", meta: dict) -> Optional[bool]:
+        if (
+            not Const.GLOSSARY_CASE_SENSITIVE in meta
+            or not meta[Const.GLOSSARY_CASE_SENSITIVE]
+        ):
+            return None
+        return meta[Const.GLOSSARY_CASE_SENSITIVE][0].strip().lower() == "true"
 
     def __is_in_glossary_dirs(self: "GlossaryPlugin", file: File) -> bool:
         matched_path: Optional[str] = next(

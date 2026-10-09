@@ -11,6 +11,8 @@ except:
 
 
 class ShortCaptionConverter(BaseConverter):
+    support_flatten_conversion = True
+
     def __init__(self: "ShortCaptionConverter") -> None:
         pass
 

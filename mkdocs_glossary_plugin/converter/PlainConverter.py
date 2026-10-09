@@ -11,6 +11,8 @@ except:
 
 
 class PlainConverter(BaseConverter):
+    support_flatten_conversion = True
+
     def __init__(self: "PlainConverter") -> None:
         pass
 

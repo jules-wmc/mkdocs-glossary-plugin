@@ -11,6 +11,8 @@ except:
 
 
 class EmphConverter(BaseConverter):
+    support_flatten_conversion = True
+
     def __init__(self: "EmphConverter") -> None:
         pass
 
